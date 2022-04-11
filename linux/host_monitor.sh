@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
+# @version 1.1.0
 # Reference:
 # https://www.fatalerrors.org/a/shell-script-case-collecting-system-cpu-memory-disk-and-network-information.html
 # https://blog.csdn.net/bin_linux96/article/details/118531859
 # https://www.jianshu.com/p/bc0eb83ef8d0
 
+echo "$$" > ./pid
 
 function cpu_usage {
   local usage=($(awk -v total=0 '
@@ -63,7 +65,7 @@ function net_flow {
 }
 
 # Host Monitor by infinite loop, you can also use crontab.
-interval=5
+interval=10
 
 # Interface configuration
 if1="eno1"
@@ -83,71 +85,68 @@ fi
 
 ki=$(( interval * 1024 ))
 
-init_cpu_usage=($(cpu_usage))
-init_if1_flow=($(net_flow ${if1} 2 10))
-init_if1_package=($(net_flow ${if1} 3 11))
-init_if2_flow=($(net_flow ${if2} 2 10))
-init_if2_package=($(net_flow ${if2} 3 11))
-init_disk_in="$(disk_in)"
-init_disk_out="$(disk_out)"
-init_disk1_io=($(disk_io ${disk1}))
-init_disk2_io=($(disk_io ${disk2}))
+init_array=(                            # capcity  index
+  "$(date -u '+%Y-%m-%dT%H:%M:%S.%NZ')" # 1        0
+  $(cpu_usage)                          # 2        1
+  "0" "0" "0"                           # 2        3      avg load
+  "0" "0" "0" "0" "0"                   # 5        6      memory and swap
+  $(net_flow ${if1} 2 10)               # 2        11
+  $(net_flow ${if1} 3 11)               # 2        13
+  $(net_flow ${if2} 2 10)               # 2        15
+  $(net_flow ${if2} 3 11)               # 2        17
+  "$(disk_in)"                          # 1        19
+  "$(disk_out)"                         # 1        20
+  $(disk_io ${disk1})                   # 2        21
+  $(disk_io ${disk2})                   # 2        23
+)
 
 while true; do
-  # date '+%H:%M:%S.%N'
-  sleep ${interval}
-  curr_cpu_usage=($(cpu_usage))
-  curr_if1_flow=($(net_flow ${if1} 2 10))
-  curr_if1_package=($(net_flow ${if1} 3 11))
-  curr_if2_flow=($(net_flow ${if2} 2 10))
-  curr_if2_package=($(net_flow ${if2} 3 11))
-  curr_disk_in="$(disk_in)"
-  curr_disk_out="$(disk_out)"
-  curr_disk1_io=($(disk_io ${disk1}))
-  curr_disk2_io=($(disk_io ${disk2}))
+  #date '+%H:%M:%S.%N'
+  # Asynchronous execute
+  sleep ${interval} &
+  pid=$!
 
-  curr_cpu_load=($(cpu_load))
-  curr_app_mem="$(app_use_memory)"
-  curr_mem="$(mem_usage Mem)"
-  curr_swap="$(mem_usage Swap)"
+  curr_array=(                            # capcity  index
+    "$(date -u '+%Y-%m-%dT%H:%M:%S.%NZ')" # 1        0
+    $(cpu_usage)                          # 2        1
+    $(cpu_load)                           # 2        3      avg load
+    "$(app_use_memory)" "$(mem_usage Mem)" "${total_mem}"
+    "$(mem_usage Swap)" "${total_swap}"   # 2        9      swap
+    $(net_flow ${if1} 2 10)               # 2        11
+    $(net_flow ${if1} 3 11)               # 2        13
+    $(net_flow ${if2} 2 10)               # 2        15
+    $(net_flow ${if2} 3 11)               # 2        17
+    "$(disk_in)"                          # 1        19
+    "$(disk_out)"                         # 1        20
+    $(disk_io ${disk1})                   # 2        21
+    $(disk_io ${disk2})                   # 2        23
+  ) # Total 25
 
-  cpu_usage_per="$(awk '{print (($2 - $4) * 100) / ($1 - $3)}' <(echo "${curr_cpu_usage[@]} ${init_cpu_usage[@]}"))"
+  awk '{
+    printf "{\
+\"timestamp\":\"%s\", \"cpu_usage\":%.2f,\
+\"cpu_load_1\":%.2f,\"cpu_load_5\":%.2f,\"cpu_load_15\":%.2f,\
+\"app_mem\":%.2f,\"used_mem\":%.2f,\"total_mem\":%.2f,\
+\"app_swap\":%.2f,\"total_swap\":%.2f,\
+\"network\":{\
+\"if1_in\":%.2f,\"if1_out\":%.2f,\
+\"if1_pkg_in\":%.2f,\"if1_pkg_out\":%.2f,\
+\"if2_in\":%.2f,\"if2_out\":%.2f,\
+\"if2_pkg_in\":%.2f,\"if2_pkg_out\":%.2f\
+},\
+\"disk\":{\
+\"disk_out\":%.2f,\"disk_in\":%.2f,\
+\"disk1_read\":%.2f,\"disk1_write\":%.2f,\
+\"disk2_read\":%.2f,\"disk2_write\":%.2f\
+}}\n", $1,($3-$28)*100/($2-$27),$4,$5,$6,$7,$8,$9,$10,$11,
+    ($12-$37)/'${ki}',($13-$38)/'${ki}',($14-$39)/'${interval}',($15-$40)/'${interval}',
+    ($16-$41)/'${ki}',($17-$42)/'${ki}',($18-$43)/'${interval}',($19-$44)/'${interval}',
+    ($20-$45)/'${interval}',($21-$46)/'${interval}',
+    ($22-$47)*0.5/'${interval}',($23-$48)*0.5/'${interval}',
+    ($24-$49)*0.5/'${interval}',($25-$50)*0.5/'${interval}'
+  }' <(echo "${curr_array[@]}" "${init_array[@]}") >> ./json_host.log
 
-  # [0] down, [1] up
-  if1_io_speed=($(awk '{print ($1 - $3) / '${ki}', ($2 - $4) / '${ki}'}' <(echo "${curr_if1_flow[@]} ${init_if1_flow[@]}")))
-  if1_pkg_speed=($(awk '{print ($1 - $3) / '${interval}', ($2 - $4) / '${interval}'}' <(echo "${curr_if1_package[@]} ${init_if1_package[@]}")))
-  if2_io_speed=($(awk '{print ($1 - $3) / '${ki}', ($2 - $4) / '${ki}'}' <(echo "${curr_if2_flow[@]} ${init_if2_flow[@]}")))
-  if2_pkg_speed=($(awk '{print ($1 - $3) / '${interval}', ($2 - $4) / '${interval}'}' <(echo "${curr_if2_package[@]} ${init_if2_package[@]}")))
+  init_array=(${curr_array[@]})
 
-  disk_i_speed="$(awk '{printf "%.f", ($1 - $2) / '${interval}'}' <(echo "${curr_disk_in} ${init_disk_in}"))"
-  disk_o_speed="$(awk '{printf "%.f", ($1 - $2) / '${interval}'}' <(echo "${curr_disk_out} ${init_disk_out}"))"
-
-  # [0] read, [1] write
-  disk1_speed=($(awk '{printf "%.f %.f", ($1 - $3) * 512 / '${ki}', ($2 - $4) * 512 / '${ki}'}' <(echo "${curr_disk1_io[@]} ${init_disk1_io[@]}")))
-  disk2_speed=($(awk '{printf "%.f %.f", ($1 - $3) * 512 / '${ki}', ($2 - $4) * 512 / '${ki}'}' <(echo "${curr_disk2_io[@]} ${init_disk2_io[@]}")))
-
-  s0="{\"timestamp\":\"$(date -u "+%Y-%m-%dT%H:%M:%S.%NZ")\",\"cpu_usage_per\":${cpu_usage_per}"
-  s1=",\"cpu_load_1\":${curr_cpu_load[0]},\"cpu_load_5\":${curr_cpu_load[1]},\"cpu_load_15\":${curr_cpu_load[2]}"
-  s2=",\"app_mem\":${curr_app_mem},\"used_mem\":${curr_mem},\"total_mem\":${total_mem}"
-  s3=",\"used_swap\":${curr_swap},\"total_swap\":${total_swap}"
-  s4=",\"network\":{\"if1_in\":${if1_io_speed[0]},\"if1_out\":${if1_io_speed[1]}"
-  s5=",\"if1_pkg_in\":${if1_pkg_speed[0]},\"if1_pkg_out\":${if1_pkg_speed[1]}"
-  s6=",\"if2_in\":${if2_io_speed[0]},\"if2_out\":${if2_io_speed[1]}"
-  s7=",\"if2_pkg_in\":${if2_pkg_speed[0]},\"if2_pkg_out\":${if2_pkg_speed[1]}}"
-  s8=",\"disk\":{\"disk_out\":${disk_i_speed},\"disk_in\":${disk_o_speed}"
-  s9=",\"disk1_read\":${disk1_speed[0]},\"disk1_write\":${disk1_speed[1]}"
-  s10=",\"disk2_read\":${disk2_speed[0]},\"disk2_write\":${disk2_speed[1]}}}"
-
-  echo "${s0}${s1}${s2}${s3}${s4}${s5}${s6}${s7}${s8}${s9}${s10}"
-
-  init_cpu_usage=(${curr_cpu_usage[@]})
-  init_if1_flow=(${curr_if1_flow[@]})
-  init_if1_package=(${curr_if1_package[@]})
-  init_if2_flow=(${curr_if2_flow[@]})
-  init_if2_package=(${curr_if2_package[@]})
-  init_disk_in="${curr_disk_in}"
-  init_disk_out="${curr_disk_out}"
-  init_disk1_io=(${curr_disk1_io[@]})
-  init_disk2_io=(${curr_disk2_io[@]})
+  wait ${pid}
 done
-
