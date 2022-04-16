@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 content=""
 
 files=$(ls "$1")

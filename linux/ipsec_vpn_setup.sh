@@ -543,6 +543,7 @@ IKEv2 guide:       https://git.io/ikev2
 ================================================
 EOF
 
+}
 
 ## Defer setup until we have the complete script
 vpnsetup "$@"

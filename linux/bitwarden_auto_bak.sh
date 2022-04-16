@@ -9,6 +9,6 @@ set -e
 FILE_NAME=bitwarden_bak_$(date +"%Y-%m-%d").tar.gz
 
 file_path=${1}
-cd ${file_path}/data/
-tar czf ${FILE_NAME} ./*
-mv ${FILE_NAME} ${file_path}/backup/
+cd "${file_path}/data/"
+tar czf "${FILE_NAME}" ./*
+mv "${FILE_NAME}" "${file_path}/backup/"

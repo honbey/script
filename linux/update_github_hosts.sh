@@ -1,4 +1,4 @@
-#/usr/bin/env bash
+#!/usr/bin/env bash
 # Update github hosts automatically. It should be executed by root user.
 
 # 0 0 * * * /usr/bin/env bash /path/to/update_hosts.sh > /dev/null 2>&1

@@ -1,1 +1,1 @@
-This directory contains scripts for Linux and Mac OSX.
+This directory contains scripts for Linux and macOS.
