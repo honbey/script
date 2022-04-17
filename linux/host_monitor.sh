@@ -127,7 +127,7 @@ while true; do
 \"timestamp\":\"%s\", \"cpu_usage\":%.2f,\
 \"cpu_load_1\":%.2f,\"cpu_load_5\":%.2f,\"cpu_load_15\":%.2f,\
 \"app_mem\":%.2f,\"used_mem\":%.2f,\"total_mem\":%.2f,\
-\"app_swap\":%.2f,\"total_swap\":%.2f,\
+\"used_swap\":%.2f,\"total_swap\":%.2f,\
 \"network\":{\
 \"if1_in\":%.2f,\"if1_out\":%.2f,\
 \"if1_pkg_in\":%.2f,\"if1_pkg_out\":%.2f,\
