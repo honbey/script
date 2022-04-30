@@ -9,7 +9,7 @@ if [[ -d "${tmp_dir}" ]]; then
   curl -sfL https://gitee.com/ineo6/hosts/raw/master/hosts -o "${tmp_dir}/hosts"
   echo -e "\n" >> "${tmp_dir}/hosts"
 
-  sed -i "/# GitHub Host Beginning/,/# GitHub Host Ending/!b;//!d;/# GitHub Host Beginning/r ${tmp_dir}/hosts" /etc/hosts
+  sed -i "/# GITHUB BEGIN/,/# GITHUB END/!b;//!d;/# GITHUB BEGIN/r ${tmp_dir}/hosts" /etc/hosts
 
   rm -rf "${tmp_dir}"
 else
