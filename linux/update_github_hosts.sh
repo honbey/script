@@ -3,16 +3,16 @@
 
 # 0 0 * * * /usr/bin/env bash /path/to/update_hosts.sh > /dev/null 2>&1
 
+trap 'rm -rf "${tmp_dir}"' EXIT
+
 tmp_dir=$(mktemp -d)
 
 if [[ -d "${tmp_dir}" ]]; then
-  curl -sfL https://gitee.com/ineo6/hosts/raw/master/hosts -o "${tmp_dir}/hosts"
-  echo -e "\n" >> "${tmp_dir}/hosts"
+    curl -sfL https://gitlab.com/ineo6/hosts/-/raw/master/hosts -o "${tmp_dir}/hosts"
+    echo -e "\n" >> "${tmp_dir}/hosts"
 
-  sed -i "/# GITHUB BEGIN/,/# GITHUB END/!b;//!d;/# GITHUB BEGIN/r ${tmp_dir}/hosts" /etc/hosts
-
-  rm -rf "${tmp_dir}"
+    sed -i "/# GITHUB BEGIN/,/# GITHUB END/!b;//!d;/# GITHUB BEGIN/r ${tmp_dir}/hosts" /etc/hosts
 else
-  echo "Making temporary directory fail!"
+    echo "Making temporary directory fail!"
 fi
 
