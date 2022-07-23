@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+# cd /Library/TeX/texbin
+# sudo mv dvisvgm dvisvgm.bak
+# sudo chmod +x dvisvgm
+dvisvgm.bak --libgs=/opt/homebrew/Celler/ghostscript/9.56.1/lib/libgs.dylib.9.56 "@"
