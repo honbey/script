@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# brew install basic # or mactex-no-gui
+# tlmgr update --self
+# tlmgr install dvisvgm
 # cd /Library/TeX/texbin
 # sudo mv dvisvgm dvisvgm.bak
 # sudo chmod +x dvisvgm
