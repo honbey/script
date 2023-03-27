@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+function safe_rm() {
+    [[ ! -d /opt/data/.trash ]] \
+        && /usr/bin/env mkdir -p /opt/data/.trash \
+        && /usr/bin/env chmod 777 /opt/data/.trash
+
+    [[ $# == 0 ]] && echo "No file to delete!" && exit 1
+
+    /usr/bin/env mv "$@" /opt/data/.trash
+    echo "The files has moved to /opt/dat/.trash"
+}
+
+alias rm='safe_rm'
