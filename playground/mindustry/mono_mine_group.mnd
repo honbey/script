@@ -1,0 +1,262 @@
+const DEBUG = true
+const message = DEBUG ? "V - Debug" : ""
+
+if DEBUG == true
+	start = @time
+end
+
+if !switch1.enabled
+	end()
+end
+
+if @unit !== null
+	found = ulocate(building, core, false, CORE_X, CORE_Y, CORE)
+else
+// assign coordinate manually
+	CORE_X = 116
+	CORE_Y = 104
+end
+
+MBANK = bank1
+allocate heap in MBANK[1...255]
+
+if MBANK[0] == 0
+	MBANK[0] = 1
+	$mineSwitchFlag = 0xa1
+end
+
+BASEFLAG = floor(@thisx) * 10000 + floor(@thisy) * 10
+
+printf("[blue]	Windswept Islands[white] ${}\n", message)
+printf("  Main Output: $ $ $ $ $ $\n", ITEM-PLASTANIUM, ITEM-TITANIUM, ITEM-SILICON, ITEM-GRAPHITE, ITEM-PYRATITE, ITEM-BLAST-COMPOUND)
+printf("  Other Output: $ $ $ $ $\n", ITEM-COPPER, ITEM-LEAD, ITEM-SCRAP, ITEM-METAGLASS, ITEM-THORIUM)
+printf("  Core $ Info:\n", BLOCK-CORE-NUCLEUS)
+printf("	Position: ${}, ${}\n", CORE_X, CORE_Y)
+printf("	Item Capacity: ${}\n", CORE.itemCapacity)
+printf("	Total Items: ${}\n", CORE.totalItems)
+printf("	Health: ${}\n", CORE.health)
+printf("  Played Time: ${} minutes\n", ceil( @minute))
+printf("  Processor Info:\n")
+printf("	Type: ${}\n", @this)
+printf("	Health: ${}\n", @this.health)
+printf("	[sky]Cryofluid: ${}[white]\n", ceil( @this.cryofluid))
+
+printflush(message5)
+
+if DEBUG == true
+	printf("[gray]LOG: DEBUG MODE[white]\n")
+end
+
+COPPER_IN_CORE = CORE.copper / CORE.itemCapacity
+LEAD_IN_CORE = CORE.lead / CORE.itemCapacity
+SAND_IN_CORE = CORE.sand / CORE.itemCapacity
+SCRAP_IN_CORE = CORE.scrap / CORE.itemCapacity
+
+const WARN_ITEM_RATE = 0.3
+const FULL_ITEM_RATE = 0.95
+
+// Mono Logic
+
+const MONO_ITEM_CAPACITY = 20
+
+if groupUnit( @mono) == true
+	uflag = floor( @unit.flag) - BASEFLAG
+	case uflag
+		when 1 then
+			groupMsg(1)
+			if countUnits(1, 6, 0) == true
+				monoMine(FULL_ITEM_RATE)
+			end
+			printflush(message1)
+		when 2 then
+			groupMsg(2)
+			if countUnits(2, 4, 0) == true
+				if COPPER_IN_CORE < WARN_ITEM_RATE
+					|| LEAD_IN_CORE < WARN_ITEM_RATE
+					|| SAND_IN_CORE < WARN_ITEM_RATE
+					|| SCRAP_IN_CORE < WARN_ITEM_RATE
+					monoMine(WARN_ITEM_RATE * 2.5)
+				else
+					approach(150, 104, 8)
+				end
+			end
+			printflush(message2)
+		when 3 then
+			groupMsg(3)
+			if countUnits(3, 2, 0) == true
+				monoMine(FULL_ITEM_RATE)
+			end
+			printflush(message3)
+	end
+end
+
+def countUnits(gid, pos, reset)
+	if reset == 1
+		flag(BASEFLAG + gid)
+		arc1.shoot(0, 0, 0)
+		return false
+	end
+	if @unit.flag > BASEFLAG + gid
+		if @unit.dead > 0
+			arc1.shootX - (10 ** pos)
+			unbind()
+		end
+		return true
+	end
+	if arc1.shootX === null
+		arc1.shoot(0, 0, 0)
+	end
+	counter = getFlagPos(arc1.shootX, pos)
+	if DEBUG == true
+		printf("[gray]LOG: COUNTER: ${}[white]\n", counter)
+	end
+	unitA = arc1.radar(ally, flying, any, distance, 1)
+	if abs(unitA.flag - floor(unitA.flag)) > 0
+		if DEBUG == true
+			printf("[gray]LOG: unitA.flag - ${} - ${} [white]\n", unitA.flag, floor(unitA.flag))
+			printf("[gray]LOG: unit has been counted[white]\n")
+		end
+		return true
+	end
+	if within(arc1.x, arc1.y, arc1.range) == true
+		&& unitA.flag == BASEFLAG + gid
+		if DEBUG == true
+			printf("[gray]LOG: set flag[white]\n")
+		end
+		arc1.shoot(arc1.shootX + (10 ** pos), 0, 0)
+		flag(BASEFLAG + gid + ((counter + 1) / 100))
+		return true
+	else
+		if DEBUG == true
+			printf("[gray]LOG: approach Arc1[white]\n")
+		end
+		approach(arc1.x, arc1.y, rand(6))
+		return false
+	end	
+end
+
+inline def getFlagPos(n, pos)
+    digit1 = floor(n / (10 ** pos)) % 10
+    digit2 = floor(n / (10 ** (pos+1))) % 10
+	if DEBUG == true
+		printf("[gray]LOG: Flag Pos - ${} ${} [white]\n", digit2, digit1)
+	end
+    return digit2 * 10 + digit1;
+end
+
+def groupUnit(type)
+	ubind(type)
+	if ! @unit.dead && @unit.flag == 0
+		if @unit.x > @thisx && @unit.y > @thisy
+			flag(BASEFLAG + 1)
+		elsif @unit.x < @thisx && @unit.y > @thisy
+			flag(BASEFLAG + 2)
+		elsif @unit.x > @thisx && @unit.y < @thisy
+			flag(BASEFLAG + 3)
+		else
+			// flag(BASEFLAG + 4)
+			unbind()
+			return false
+		end
+		return true
+	elsif ! @unit.dead && BASEFLAG < @unit.flag && @unit.flag < BASEFLAG + 4.5
+		return true
+	else
+		unbind()
+		return false
+	end
+end
+
+
+// threshold
+def monoMine(t)
+	if DEBUG == true
+		printf("[gray]LOG: Mining Switch: ${}[white]\n", $mineSwitchFlag)
+	end
+	case $mineSwitchFlag
+		when 0xa1 then
+			if COPPER_IN_CORE < t
+				mining( @copper, MONO_ITEM_CAPACITY)
+				printf("[yellow]  Mining status: [white]$\n", ITEM-COPPER)
+			else
+				$mineSwitchFlag += 1
+			end
+		when 0xa2 then
+			if LEAD_IN_CORE < t
+				mining( @lead, MONO_ITEM_CAPACITY)
+				printf("[yellow]  Mining status: [white]$\n", ITEM-LEAD)
+			else
+				$mineSwitchFlag += 1
+			end
+		when 0xa3 then
+			if SAND_IN_CORE < t
+				mining( @sand, MONO_ITEM_CAPACITY)
+				printf("[yellow]  Mining status: [white]$\n", ITEM-SAND)
+			else
+				$mineSwitchFlag += 1
+			end
+		when 0xa4 then
+			if SCRAP_IN_CORE < t
+				mining( @scrap, MONO_ITEM_CAPACITY)
+				printf("[yellow]  Mining status: [white]$\n", ITEM-SCRAP)
+			else
+				$mineSwitchFlag += 1
+			end
+		else
+			$mineSwitchFlag = 0xa1
+	end
+end
+
+// ore type
+def mining(t, amount)
+	found = ulocate(ore, t, x, y)
+	if ! found
+		printf("[red]  WARNING: Cannot find ore ${} [white]\n", t)
+		$mineSwitchFlag += 1
+	elsif ( @unit.totalItems < amount)
+		&& ( @unit.firstItem == t || @unit.firstItem === null)
+		approach(x, y, 3)
+		mine(x, y)
+	else
+		drop2Core(amount * 3)
+	end
+end
+
+
+def drop2Core(amount)
+	if DEBUG == true
+		printf("[gray]LOG: CORE Capacity: $ , Unit's firstItem in CORE: $[white]\n", CORE.itemCapacity, CORE.sensor( @unit.firstItem))
+	end
+	// TODO: mining units near core will always drop2Core()
+	if CORE.sensor( @unit.firstItem) == CORE.itemCapacity
+		itemDrop( @air, amount)
+	else
+	approach(CORE_X, CORE_Y, 6)
+	itemDrop(CORE, amount)
+	end
+end
+
+
+def groupMsg(gid)
+	printf("Group ${} Unit Info:\n", gid)
+	printf("  Position: (${}, ${})\n", floor( @unit.x), floor( @unit.y))
+	printf("  Health: ${}\n", @unit.health)
+	printf("  First Items: ${}\n", @unit.firstItem)
+	printf("  Total Items: ${}\n", @unit.totalItems)
+	printf("  [red]Flag: ${}[white]\n", @unit.flag)
+end
+
+
+if DEBUG == true
+	end_ = @time
+	$runCount += 1
+	$totalTime += ceil(end_ - start)
+	if $totalTime > 0xFFF
+		avgTime = ceil($totalTime / $runCount)
+		$runCount = 0
+		$totalTime = 0
+	end
+	printf("\n[gray]LOG: Cost time: ${}ms\n", ceil(end_ - start))
+	printf("\n[gray]LOG: Avg Cost time: ${}ms\n", avgTime)
+	printflush(message6)
+end
