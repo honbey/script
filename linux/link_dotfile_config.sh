@@ -1,17 +1,22 @@
 #!/usr/bin/env bash
 
+set -x
+
 rm -rf ~/.zshrc ~/.gitconfig ~/.vimrc ~/.tmux.conf ~/.sqliterc ~/.npmrc ~/.env ~/.wezterm.lua
 
-rm -rf ~/.config/nvim ~/.config/pip ~/.config/go
+rm -rf ~/.ssh/config ~/.config/nvim ~/.config/pip ~/.config/go
 
-ln -s /opt/data/workspace/config/dotfile/.zshrc       ~/.zshrc
-ln -s /opt/data/workspace/config/dotfile/.gitconfig   ~/.gitconfig
-ln -s /opt/data/workspace/config/dotfile/.vimrc       ~/.vimrc
-ln -s /opt/data/workspace/config/dotfile/.tmux.conf   ~/.tmux.conf
-ln -s /opt/data/workspace/config/dotfile/.sqliterc    ~/.sqliterc
-ln -s /opt/data/workspace/config/dotfile/.npmrc       ~/.npmrc
-ln -s /opt/data/workspace/config/dotfile/.env         ~/.env
-ln -s /opt/data/workspace/config/dotfile/.wezterm.lua ~/.wezterm.lua
-ln -s /opt/data/workspace/config/dotfile/_config/nvim ~/.config/nvim
-ln -s /opt/data/workspace/config/dotfile/_config/pip  ~/.config/pip
-ln -s /opt/data/workspace/config/dotfile/_config/go   ~/.config/go
+CONFIG_DIR="$1"
+
+ln -s "${CONFIG_DIR}"/dotfile/.zshrc ~/.zshrc
+ln -s "${CONFIG_DIR}"/dotfile/.gitconfig ~/.gitconfig
+ln -s "${CONFIG_DIR}"/dotfile/.vimrc ~/.vimrc
+ln -s "${CONFIG_DIR}"/dotfile/.tmux.conf ~/.tmux.conf
+ln -s "${CONFIG_DIR}"/dotfile/.sqliterc ~/.sqliterc
+ln -s "${CONFIG_DIR}"/dotfile/.npmrc ~/.npmrc
+ln -s "${CONFIG_DIR}"/dotfile/.env ~/.env
+ln -s "${CONFIG_DIR}"/dotfile/.wezterm.lua ~/.wezterm.lua
+ln -s "${CONFIG_DIR}"/dotfile/ssh/config ~/.ssh/config
+ln -s "${CONFIG_DIR}"/dotfile/nvim ~/.config/nvim
+ln -s "${CONFIG_DIR}"/dotfile/pip ~/.config/pip
+ln -s "${CONFIG_DIR}"/dotfile/go ~/.config/go
