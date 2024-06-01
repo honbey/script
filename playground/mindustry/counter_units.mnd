@@ -1,0 +1,51 @@
+#set target=ML7AS
+
+const DEBUG = false
+
+if DEBUG === true
+	start = @time
+end
+if DEBUG === true
+	MBANK = cell1
+	allocate heap in MBANK[60...63]
+end
+
+if !switch1.enabled
+	end()
+end
+
+const MAX_NUM = 24
+
+UNIT_TYPE = @dagger
+FIRST_UNIT = null
+COUNTER = 0
+
+do
+	ubind(UNIT_TYPE)
+	printf("Counting ${}...\n", @unit)
+	printf("counter: ${}\n", COUNTER)
+	printflush(message1)
+	if COUNTER === 0
+		FIRST_UNIT = @unit
+		COUNTER += 1
+	elsif FIRST_UNIT !== @unit
+		COUNTER += 1
+	else break
+	end
+loop while @unit !== null	
+
+wait(1)
+
+if DEBUG == true
+	end_ = @time
+	$runCount += 1
+	$totalTime += ceil(end_ - start)
+	if $totalTime > 0xFFF
+		avgTime = ceil($totalTime / $runCount)
+		$runCount = 0
+		$totalTime = 0
+	end
+	printf("\n[gray]LOG: Cost time: ${}ms\n", ceil(end_ - start))
+	printf("\n[gray]LOG: Avg Cost time: ${}ms\n", avgTime)
+	printflush(message2)
+end

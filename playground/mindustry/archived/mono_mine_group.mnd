@@ -1,3 +1,5 @@
+#set target = ML7AS
+
 const DEBUG = true
 const message = DEBUG ? "V - Debug" : ""
 
@@ -20,7 +22,7 @@ end
 MBANK = bank1
 allocate heap in MBANK[1...255]
 
-if MBANK[0] == 0
+if MBANK[0] === 0
 	MBANK[0] = 1
 	$mineSwitchFlag = 0xa1
 end
@@ -235,7 +237,6 @@ def drop2Core(amount)
 	itemDrop(CORE, amount)
 	end
 end
-
 
 def groupMsg(gid)
 	printf("Group ${} Unit Info:\n", gid)

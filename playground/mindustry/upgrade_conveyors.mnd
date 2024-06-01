@@ -1,0 +1,128 @@
+// http://mindcode.herokuapp.com/?s=upgrade-conveyors
+#set target = ML7A      // Using revised syntax for getBlock here
+
+// Initialize variables first; these can be changed in the compiled code
+MEMORY = cell1
+UNIT = @poly
+
+// Coordinates of the map area to process
+// By default an entire map is converted
+SW_X = 0
+SW_Y = 0
+NE_X = @mapw
+NE_Y = @maph
+
+// Setting to true restores copper conveyors (useful for testing)
+DOWNGRADE = false
+
+// Upgrading in stripes of given width -- faster processing
+// (Could be even wider, the build radius is ~20 blocks or so)
+WIDTH = 10
+
+// How close unit needs to get to the block being upgraded
+RADIUS = 10
+
+// Count the total number of upgraded blocks
+TOTAL = 0
+
+allocate heap in MEMORY[0 ... 16]
+
+// If a memory cell is attached, the progress can be stored there
+if $INITIALIZED 
+    x = limit($X, SW_X, NE_X)
+    y = limit($Y, SW_Y, NE_Y)
+    dx = $DX == 1 ? 1 : -1
+    dy = $DY > 0 ? WIDTH : -WIDTH
+    TOTAL = $TOTAL
+else
+    $INITIALIZED = true
+    x = $X = SW_X
+    y = $Y = SW_Y
+    dx = 1
+    dy = WIDTH
+end
+
+oldType = DOWNGRADE ? @titanium-conveyor : @conveyor
+newType = DOWNGRADE ? @conveyor : @titanium-conveyor
+
+// It is possible to pause/stop the processing
+// by attaching a switch and activating it
+while switch1.enabled == false
+
+    // If we don't have an active unit, summon a new one
+    if @unit.dead !== 0 or @unit.controller != @this
+        findUnit()
+    end
+    
+    // Position the unit to the middle of the band
+    ypos = limit(y + WIDTH \ 2, SW_Y, NE_Y)
+    do 
+        move(x, ypos)
+    loop while not within(x, ypos, RADIUS)
+
+    // Upgrade all blocks in the band
+    for yrep in y .. min(NE_Y, y + WIDTH - 1)
+        replace(x, yrep, oldType, newType)
+    end
+    $TOTAL = TOTAL
+    
+    printf("Position: $x, $ypos\n")
+    printf("Upgrades: $TOTAL")
+    printflush(message1)
+    
+    // Move to next position
+    x += dx
+    if x > NE_X || x < SW_X
+        dx *= -1
+        y += dy
+        x = limit(x, SW_X, NE_X)
+        $DX = dx
+
+        if y > NE_Y || y < SW_Y
+            dy *= -1
+            y = limit(y, SW_Y, NE_Y)
+            $DY = dy
+        end
+        $Y = y
+    end
+    
+    $X = x
+end
+
+inline def findUnit()
+    // Keep looking for unit until one is found
+    while true
+        ubind(UNIT)
+        if @unit == null
+            printf("No unit of type $UNIT found.")
+        elsif @unit.controlled != 0
+            printf("Looking for a free $UNIT...")
+        else
+            flag(1)		// Mark unit as active
+            break
+        end
+        printflush(message1)
+    end
+end
+
+// Returns value of n limited to range min .. max
+inline def limit(n, min, max)
+    min(max(n, min), max)
+end
+
+// If a block of type oldType is found at position,
+// replaces it with newType
+inline def replace(x, y, oldType, newType)
+    b_building = getBlock(x, y, b_type)
+    
+    if b_type == oldType
+        build(x, y, newType, b_building.rotation, 0)
+        // If the processor is too fast, we need to wait
+        // for the unit to finish building the block
+        do
+            getBlock(x, y, b_type)
+        loop while b_type != newType
+        TOTAL += 1
+    end
+end
+

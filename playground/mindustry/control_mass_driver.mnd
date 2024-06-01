@@ -1,0 +1,9 @@
+#set target = ML7AS
+
+for i = 0; i < @links; i+=1
+	building = getlink(i)
+	if building.type !== @massDriver
+		contiune
+	end
+	building.enabled = building.totalItems >= building.itemCapacity ? true: false
+end
