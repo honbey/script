@@ -5,7 +5,7 @@ VAULT_THR = 300
 while true
 	for i = 0; i < 16;
 		type = lookup(item, i)
-		if vault1.sensor(type) >= 300
+		if vault1.sensor(type) >= VAULT_THR
 			unloader1.config(type)
 			VAULT_THR = 100
 		else
