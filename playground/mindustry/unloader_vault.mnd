@@ -1,14 +1,15 @@
 #set target=ML7AS
 
-while true
-	for i = 0; i < @links; i += 1
-		reactor = getlink(i)
-		if reactor.type !== @thorium-reactor
-			continue
-		else
-			reactor.enabled =
-				reactor.cryofluid / reactor.liquidCapacity > 0.7 ?
-				true : false
-		end
+VAULT_THR = 300
+
+for i = 0; i < 16;
+	type = lookup(item, i)
+	if vault1.sensor(type) >= 300
+		unloader1.config(type)
+		VAULT_THR = 100
+	else
+		i += 1
+		VAULT_THR = 300
+		unloader1.config(@copper)
 	end
 end
