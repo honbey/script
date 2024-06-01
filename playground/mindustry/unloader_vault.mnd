@@ -2,14 +2,16 @@
 
 VAULT_THR = 300
 
-for i = 0; i < 16;
-	type = lookup(item, i)
-	if vault1.sensor(type) >= 300
-		unloader1.config(type)
-		VAULT_THR = 100
-	else
-		i += 1
-		VAULT_THR = 300
-		unloader1.config(@copper)
+while true
+	for i = 0; i < 16;
+		type = lookup(item, i)
+		if vault1.sensor(type) >= 300
+			unloader1.config(type)
+			VAULT_THR = 100
+		else
+			i += 1
+			VAULT_THR = 300
+			unloader1.config(@copper)
+		end
 	end
 end
