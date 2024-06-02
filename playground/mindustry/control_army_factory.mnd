@@ -1,6 +1,6 @@
-#set target=ML7AS
+#set target = ML7AS
 
-const DEBUG = false
+const DEBUG = true
 
 if DEBUG === true
 	start = @time
@@ -16,27 +16,34 @@ if !switch1.enabled
 	end()
 end
 
-const MAX_NUM = 24
+// ***************** Logic Start ********************** //
 
-UNIT_TYPE = @dagger
-FIRST_UNIT = null
+FACTORY = factory1
+PROD_NUM = 12
+
 COUNTER = 0
+FIRST_UNIT = null
 
-do
-	ubind(UNIT_TYPE)
-	printf("Counting ${}...\n", @unit)
-	printf("counter: ${}\n", COUNTER)
-	printflush(message1)
+printf("Control factory's work state by\n")
+printf("  counting total same units...\n")
+
+do 
+	ubind(FACTORY.config)
 	if COUNTER === 0
 		FIRST_UNIT = @unit
 		COUNTER += 1
 	elsif FIRST_UNIT !== @unit
 		COUNTER += 1
-	else break
+	else 
+		printf("counter: ${}\n", COUNTER)
+		printflush(message1)
+		break
 	end
-loop while @unit !== null && @unit.health > 0
+loop while FACTORY.config !== null && @unit.health > 0
 
-wait(1)
+FACTORY.enabled = COUNTER >= PROD_NUM ? false : true
+
+// *****************  Logic End  ********************** //
 
 if DEBUG == true
 	end_ = @time

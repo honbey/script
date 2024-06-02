@@ -1,14 +1,14 @@
-#set target=ML7AS
+#set target = ML7AS
 
-const DEBUG = false
+const DEBUG = true
 
 if DEBUG === true
 	start = @time
 end
 if DEBUG === true
 	// debug memory cell, change N to one that linked by processor
-	D_MC = cell1
-	D_MSG = message2
+	D_MC = cellN
+	D_MSG = messageN
 	allocate heap in D_MC[60...63]
 end
 
@@ -16,27 +16,13 @@ if !switch1.enabled
 	end()
 end
 
-const MAX_NUM = 24
+// ***************** Logic Start ********************** //
 
-UNIT_TYPE = @dagger
-FIRST_UNIT = null
-COUNTER = 0
+do 
+	ubind(@mono)
+loop @unit.health > 0
 
-do
-	ubind(UNIT_TYPE)
-	printf("Counting ${}...\n", @unit)
-	printf("counter: ${}\n", COUNTER)
-	printflush(message1)
-	if COUNTER === 0
-		FIRST_UNIT = @unit
-		COUNTER += 1
-	elsif FIRST_UNIT !== @unit
-		COUNTER += 1
-	else break
-	end
-loop while @unit !== null && @unit.health > 0
-
-wait(1)
+// *****************  Logic End  ********************** //
 
 if DEBUG == true
 	end_ = @time
