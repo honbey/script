@@ -1,0 +1,49 @@
+// When test some logic which will use Units, the core usually leak resources,
+// this to fill 16 types of resources to core with one Item Source.
+#set target = ML7AS
+
+const DEBUG = false
+
+if DEBUG === true
+	start = @time
+end
+if DEBUG === true
+	// debug memory cell, change N to one that linked by processor
+	D_MC = cellN
+	D_MSG = messageN
+	allocate heap in D_MC[60...63]
+end
+
+if !switch1.enabled
+	end()
+end
+
+// ***************** Logic Start ********************** //
+
+i = 0
+do 
+	type = lookup(item, i)
+	core = getlink(2)
+	if core.sensor(type) / core.itemCapacity < 0.1
+		source1.config(type)
+	else
+		source1.config(null)
+		i += 1
+	end
+loop while i < 16
+
+// *****************  Logic End  ********************** //
+
+if DEBUG == true
+	end_ = @time
+	$runCount += 1
+	$totalTime += ceil(end_ - start)
+	if $totalTime > 0xFFF
+		avgTime = ceil($totalTime / $runCount)
+		$runCount = 0
+		$totalTime = 0
+	end
+	printf("\n[gray]LOG: Cost time: ${}ms\n", ceil(end_ - start))
+	printf("\n[gray]LOG: Avg Cost time: ${}ms\n", avgTime)
+	printflush(D_MSG)
+end

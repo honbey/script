@@ -1,0 +1,121 @@
+// Processor Description:
+//   To gather a specified number of units 
+//   and search for enemies to attack automatically.
+
+#set target = ML7AS
+
+const DEBUG = false
+
+if DEBUG === true
+	// debug memory cell, change N to one that linked by processor
+	D_MC = cell1
+	D_MSG = message2
+	allocate heap in D_MC[60...63]
+end
+
+if !switch1.enabled
+	end()
+end
+
+// ***************** Logic Start ********************** //
+
+REPAIR_POINT = point1
+UNIT_NUM = 12
+UNIT_TYPE = @flare
+HEALTH_RATE = 0.75
+ATTACK_RANGE = 50
+
+FIRST_UNIT = null
+COUNTER = 0
+
+do
+	ubind(UNIT_TYPE)
+	if COUNTER < UNIT_NUM
+		approach(@thisx, @thisy, 10)
+	end
+	if COUNTER === 0
+		FIRST_UNIT = @unit
+		COUNTER += 1
+	elsif FIRST_UNIT !== @unit
+		COUNTER += 1
+	else
+		printf("Assembling ${}...\n", @unit)
+		printf("Current: ${}, Target: ${}\n", COUNTER, UNIT_NUM)
+		printflush(message1)
+		break
+	end
+loop while @unit !== null && @unit.health > 0
+
+FIRST_UNIT = null
+MAX_HEALTH = UNIT_NUM * @unit.maxHealth
+CURRENT_HEALTH = 0
+ORD_RATE = 0
+
+unbind()
+
+while (COUNTER >= UNIT_NUM && switch1.enabled)
+	if DEBUG === true
+		enemy = uradar(player, any, any, distance, true)
+	else
+		enemy = uradar(enemy, any, any, distance, true)
+	end
+
+	do
+		ubind(UNIT_TYPE)
+		
+		if DEBUG === true
+			start = @time
+		end
+		enemyDistance = 1000
+
+		if @unit.health / @unit.maxHealth < 0.5
+			approach(REPAIR_POINT.x, REPAIR_POINT.y, 6)
+		elsif enemy !== null && enemy.health > 0
+			enemyDistance = sqrt((enemy.x - @unit.x) ** 2 + (enemy.y - @unit.y) ** 2)
+			approach(enemy.x, enemy.y, @unit.range - 1)
+			targetp(enemy, true)
+			// if enemyDistance < @unit.range + 30
+		elsif @unit.health === @unit.maxHealth
+			autoPathfind()
+		end
+
+		ORD_RATE = CURRENT_HEALTH / MAX_HEALTH
+		if CURRENT_HEALTH === 0
+			FIRST_UNIT = @unit
+			CURRENT_HEALTH += @unit.health
+		elsif FIRST_UNIT !== @unit
+			CURRENT_HEALTH += @unit.health
+		else
+			if ORD_RATE <= HEALTH_RATE
+				end()
+			end
+			printf("Ally - Health Rate: ${}\n", ORD_RATE)
+			printf("Enemy - ${} (${}, ${})\n", enemy, floor(enemy.x), floor(enemy.y))
+			printf("  Health: ${}, Max Health: ${}\n", enemy.health, enemy.maxHealth)
+			printflush(message1)
+			CURRENT_HEALTH = 0
+		end
+
+		if DEBUG == true
+			end_ = @time
+			$runCount += 1
+			$totalTime += ceil(end_ - start)
+			if $totalTime > 0xFFF
+				avgTime = ceil($totalTime / $runCount)
+				$runCount = 0
+				$totalTime = 0
+			end
+			printf("[gray]LOG: Enemy Distance: ${}\n", ceil(enemyDistance))
+			printf("\n[gray]LOG: Cost time: ${}ms\n", ceil(end_ - start))
+			printf("\n[gray]LOG: Avg Cost time: ${}ms\n", avgTime)
+			printflush(D_MSG)
+		end
+
+	loop while enemy !== null 
+				&& enemy.health > 0 
+				&& enemyDistance < @unit.range + ATTACK_RANGE
+				&& switch1.enabled
+end
+
+// *****************  Logic End  ********************** //
+

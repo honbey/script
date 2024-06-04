@@ -1,0 +1,41 @@
+// XXX: becase i think the default AI of turret is enough, 
+//      and i have implemented with MlogJS, suspend this
+#set target = ML7AS
+
+const DEBUG = true
+
+if DEBUG === true
+	start = @time
+end
+if DEBUG === true
+	// debug memory cell, change N to one that linked by processor
+	D_MC = cellN
+	D_MSG = messageN
+	allocate heap in D_MC[60...63]
+end
+
+if !switch1.enabled
+	end()
+end
+
+// ***************** Logic Start ********************** //
+
+do 
+	ubind(@mono)
+loop @unit.health > 0
+
+// *****************  Logic End  ********************** //
+
+if DEBUG == true
+	end_ = @time
+	$runCount += 1
+	$totalTime += ceil(end_ - start)
+	if $totalTime > 0xFFF
+		avgTime = ceil($totalTime / $runCount)
+		$runCount = 0
+		$totalTime = 0
+	end
+	printf("\n[gray]LOG: Cost time: ${}ms\n", ceil(end_ - start))
+	printf("\n[gray]LOG: Avg Cost time: ${}ms\n", avgTime)
+	printflush(D_MSG)
+end
