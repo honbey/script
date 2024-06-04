@@ -1,6 +1,6 @@
 #set target = ML7AS
 
-const DEBUG = true
+const DEBUG = false
 
 if DEBUG === true
 	start = @time
