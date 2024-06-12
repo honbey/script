@@ -229,7 +229,8 @@ def drop2Core(amount)
 	if DEBUG == true
 		printf("[gray]LOG: CORE Capacity: $ , Unit's firstItem in CORE: $[white]\n", CORE.itemCapacity, CORE.sensor( @unit.firstItem))
 	end
-	// TODO: mining units near core will always drop2Core()
+	// mining units near core will always drop2Core()
+	// fix by move x+10, y+10
 	if CORE.sensor( @unit.firstItem) == CORE.itemCapacity
 		itemDrop( @air, amount)
 	else
