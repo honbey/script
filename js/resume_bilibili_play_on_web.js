@@ -12,63 +12,64 @@
 (function () {
   "use strict";
 
-  // const closeLoginBtn = document.querySelector('body > div.bili-mini-mask > div > div.bili-mini-close-icon');
-
-  // Reference: https://www.163.com/dy/article/GIE0I3F40531H1T5.html
-  function getNetworkRequesets(
-    entries = performance.getEntriesByType("resource"),
-    type = ["xmlhttprequest"],
-  ) {
-    return entries.filter((entry) => {
-      return type.indexOf(entry.initiatorType) > -1;
-    });
-  }
-
-  function printRequest(requests) {
-    if (requests.length !== 0) {
-      console.log(requests.map((request) => request.name));
-    }
-  }
-
-  const triggerRegex =
-    /http[s]?:\/\/api\.bilibili\.com\/.*w_real_played_time=(45|60|105|315)/gm;
-  //const triggerRegex = /api.bilibili.com/g;
-
-  function resumeVideoPlay(requests) {
-    if (requests.length !== 0) {
-      requests.map((request) => {
-        if (request.name.search(triggerRegex) > -1) {
-          const playBtn = document.querySelector(
-            "#bilibili-player > div > div > div.bpx-player-primary-area" +
-              "> div.bpx-player-video-area > div.bpx-player-control-wrap " +
-              "> div.bpx-player-control-entity > div.bpx-player-control-b" +
-              "ottom > div.bpx-player-control-bottom-left > div.bpx-playe" +
-              "r-ctrl-btn.bpx-player-ctrl-play",
-          );
-          const player = document.querySelector("#bilibili-player > div > div");
-          console.log(player.getAttribute("class"));
-          setTimeout(() => {
-            if (
-              playBtn !== null &&
-              player.getAttribute("class").includes("bpx-state-paused")
-            ) {
-              playBtn.click();
-            }
-            console.log(
-              'Having Detected "' + request.name + '", to resume video play',
-            );
-          }, 100);
-        }
+  // https://www.52pojie.cn/thread-1827587-1-1.html
+  let oldXhrOpen = XMLHttpRequest.prototype.open;
+  XMLHttpRequest.prototype.open = function () {
+    if (arguments[1].indexOf("/web-interface/nav") != -1) {
+      let oldGet = Object.getOwnPropertyDescriptor(
+        XMLHttpRequest.prototype,
+        "responseText",
+      ).get;
+      Object.defineProperty(this, "responseText", {
+        configurable: true,
+        enumerable: true,
+        get: function get() {
+          let res = JSON.parse(oldGet.apply(this, arguments));
+          res.code = 0;
+          res.message = "0";
+          res.data = {
+            isLogin: true,
+            wbi_img: [],
+          };
+          return JSON.stringify(res);
+        },
+        set: undefined,
       });
     }
-  }
+    return oldXhrOpen.apply(this, arguments);
+  };
 
-  function perfObserver(list, observer) {
-    var requests = getNetworkRequesets(list.getEntriesByType("resource"));
-    // printRequest(requests);
-    resumeVideoPlay(requests);
-  }
+  let oldJsonParse = JSON.parse;
+  JSON.parse = function () {
+    if (arguments[0].indexOf('"isLogin":false') != -1) {
+      arguments[0] = arguments[0]
+        .replace('"code":-101', '"code":0')
+        .replace('"isLogin":false', '"isLogin":true');
+    }
+    return oldJsonParse.apply(this, arguments);
+  };
 
-  const reqObserver = new PerformanceObserver(perfObserver);
-  reqObserver.observe({ entryTypes: ["resource"] });
+  let oldfetch = fetch;
+  function fuckfetch() {
+    if (arguments[0].indexOf("/web-interface/nav") != -1) {
+      debugger;
+      return new Promise((resolve, reject) => {
+        oldfetch.apply(this, arguments).then((response) => {
+          const oldJson = response.json;
+          response.json = function () {
+            return new Promise((resolve, reject) => {
+              oldJson.apply(this, arguments).then((result) => {
+                //修改result
+                resolve(result);
+              });
+            });
+          };
+          resolve(response);
+        });
+      });
+    } else {
+      return oldfetch.apply(this, arguments);
+    }
+  }
+  window.fetch = fuckfetch;
 })();
