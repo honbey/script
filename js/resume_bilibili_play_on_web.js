@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Resume play automatically on Bilibili
 // @namespace    http://tampermonkey.net/
-// @version      2023-12-10
+// @version      2025-01-25
 // @description  try to take over the world!
 // @author       Honbey
 // @match        *://www.bilibili.com/video/*
