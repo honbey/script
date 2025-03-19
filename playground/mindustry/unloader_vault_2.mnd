@@ -1,0 +1,24 @@
+// Specify an type when it approximate to full then unload
+#set target=ML7AS
+
+VAULT_THR = 300
+
+while true
+	for i = 0; i < 16;
+		type = lookup(item, i)
+		if i === 6
+			if vault1.sensor(type) >= 900
+				unloader1.config(type)
+				wait(1)
+			end
+			i += 1
+		elsif vault1.sensor(type) >= VAULT_THR
+			unloader1.config(type)
+			VAULT_THR = 100
+		else
+			i += 1
+			VAULT_THR = 300
+			unloader1.config(@copper)
+		end
+	end
+end

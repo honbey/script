@@ -1,0 +1,104 @@
+#set target = ML7AS
+
+const DEBUG = false
+
+if DEBUG === true
+	start = @time
+end
+if DEBUG === true
+	// debug memory cell, change N to one that linked by processor
+	D_MC = cellN
+	D_MSG = messageN
+	allocate heap in D_MC[60...63]
+end
+
+if !switch1.enabled
+	end()
+end
+
+// ***************** Logic Start ********************** //
+
+UNIT_TYPE = @flare
+LO = 1
+HI = 8
+SORTER1 = sorter1
+SORTER2 = sorter2
+SORTER3 = sorter3
+
+AMOUNT = UNIT_TYPE.itemCapacity
+
+const ITEM_CAPACITY = 1000
+
+ubind(UNIT_TYPE)
+core = ulocate(building, core, false, c_x, c_y, c_found)
+if !c_found
+	end()
+end
+// unbind()
+
+for i = 0; i < @links && switch1.enabled;
+	vault = getlink(i)
+	if vault.type !== @vault
+		i += 1
+		continue
+	end
+
+	ubind(UNIT_TYPE)
+	if LO <= @unit.flag && @unit.flag <= HI && @unit.health > 0
+		if SORTER1.config !== null
+			&& (vault.sensor(SORTER1.config) < ITEM_CAPACITY
+				|| vault.sensor(SORTER1.config) === null)
+			carry(SORTER1.config, core, vault)
+		elsif SORTER2.config !== null
+			&& (vault.sensor(SORTER2.config) < ITEM_CAPACITY
+				|| vault.sensor(SORTER2.config) === null)
+			carry(SORTER2.config, core, vault)
+		elsif SORTER3.config !== null
+			&& (vault.sensor(SORTER3.config) < ITEM_CAPACITY
+				|| vault.sensor(SORTER3.config) === null)
+			carry(SORTER3.config, core, vault)
+		else
+			approach(c_x, c_y, 9)
+			i += 1
+		end
+	else
+		continue
+	end
+	if i === @links
+		i = 0
+	end
+	printflush(message1)
+end
+
+def carry(item, src, dst)
+	if @unit.firstItem === null
+		|| (@unit.firstItem === item
+			&& @unit.totalItems < AMOUNT
+			&& !within(vault.x, vault.y, 15))
+		approach(src.x, src.y, 8)
+		itemTake(src, item, AMOUNT)
+	elsif (@unit.firstItem !== item)
+		approach(src.x, src.y, 8)
+		itemDrop(core, AMOUNT)
+	else
+		approach(dst.x, dst.y, 8)
+		itemDrop(dst, AMOUNT)
+	end
+	printf("${} is carrying *[red]${}[white]* to ${}\n", @unit, item, dst)
+end
+
+// *****************  Logic End  ********************** //
+
+if DEBUG == true
+	end_ = @time
+	$runCount += 1
+	$totalTime += ceil(end_ - start)
+	if $totalTime > 0xFFF
+		avgTime = ceil($totalTime / $runCount)
+		$runCount = 0
+		$totalTime = 0
+	end
+	printf("\n[gray]LOG: Cost time: ${}ms\n", ceil(end_ - start))
+	printf("\n[gray]LOG: Avg Cost time: ${}ms\n", avgTime)
+	printflush(D_MSG)
+end

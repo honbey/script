@@ -1,0 +1,114 @@
+#set target = ML7AS
+
+const DEBUG = false
+
+if DEBUG === true
+	start = @time
+end
+if DEBUG === true
+	// debug memory cell, change N to one that linked by processor
+	D_MC = cellN
+	D_MSG = messageN
+	allocate heap in D_MC[60...63]
+end
+
+if !switch1.enabled
+	end()
+end
+
+// ***************** Logic Start ********************** //
+
+UNIT_TYPE = @flare
+LO = 17
+HI = 24
+
+AMOUNT = UNIT_TYPE.itemCapacity
+
+ubind(UNIT_TYPE)
+core = ulocate(building, core, false, c_x, c_y, c_found)
+if !c_found
+	end()
+end
+
+do 
+	factory = getlink(2)
+	ITEM_1 = @silicon
+	if factory.type === @tetrative-reconstructor
+		ITEM_1_C = 2000
+		ITEM_2 = @plastanium
+		ITEM_2_C = 1200
+		ITEM_3 = @surge-alloy
+		ITEM_3_C = 1000
+		ITEM_4 = @phase-fabric
+		ITEM_4_C = 700
+	elsif factory.type === @exponential-reconstructor
+		ITEM_1_C = 1700
+		ITEM_2 = @titanium
+		ITEM_2_C = 1500
+		ITEM_3 = @plastanium
+		ITEM_3_C = 1300
+	elsif factory.type === @multiplicative-reconstructor
+		ITEM_1_C = 260
+		ITEM_2 = @titanium
+		ITEM_2_C = 160
+		ITEM_3 = @metaglass
+		ITEM_3_C = 80
+	end
+
+	ubind(UNIT_TYPE)
+	if LO <= @unit.flag && @unit.flag <= HI && @unit.health > 0
+		if ITEM_1 !== null
+			&& (factory.sensor(ITEM_1) === null
+				|| factory.sensor(ITEM_1) < ITEM_1_C)
+			carry(ITEM_1, core, factory)
+		elsif ITEM_2 !== null
+			&& (factory.sensor(ITEM_2) === null
+				|| factory.sensor(ITEM_2) < ITEM_2_C)
+			carry(ITEM_2, core, factory)
+		elsif ITEM_3 !== null
+			&& (factory.sensor(ITEM_3) === null
+				|| factory.sensor(ITEM_3) < ITEM_3_C)
+			carry(ITEM_3, core, factory)
+		elsif ITEM_4 !== null
+			&& (factory.sensor(ITEM_4) === null
+				|| factory.sensor(ITEM_4) < ITEM_4_C)
+			carry(ITEM_4, core, factory)
+		else
+			approach(c_x, c_y, 9)
+		end
+	end
+loop while switch1.enabled
+
+def carry(item, src, dst)
+	if @unit.firstItem === null
+		|| (@unit.firstItem === item
+			&& @unit.totalItems < AMOUNT
+			&& !within(vault.x, vault.y, 15))
+		approach(src.x, src.y, 8)
+		itemTake(src, item, AMOUNT)
+	elsif (@unit.firstItem !== item)
+		approach(src.x, src.y, 8)
+		itemDrop(core, AMOUNT)
+	else
+		approach(dst.x, dst.y, 8)
+		itemDrop(dst, AMOUNT)
+	end
+	printf("${} is carrying *[red]${}[white]* to ${}\n", @unit, item, dst)
+	printflush(message1)
+end
+
+// *****************  Logic End  ********************** //
+
+if DEBUG == true
+	end_ = @time
+	$runCount += 1
+	$totalTime += ceil(end_ - start)
+	if $totalTime > 0xFFF
+		avgTime = ceil($totalTime / $runCount)
+		$runCount = 0
+		$totalTime = 0
+	end
+	printf("\n[gray]LOG: Cost time: ${}ms\n", ceil(end_ - start))
+	printf("\n[gray]LOG: Avg Cost time: ${}ms\n", avgTime)
+	printflush(D_MSG)
+end

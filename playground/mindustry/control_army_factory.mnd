@@ -29,17 +29,22 @@ printf("  counting total same units...\n")
 
 do 
 	ubind(FACTORY.config)
+	if @unit === null
+		break
+	end
 	if COUNTER === 0
 		FIRST_UNIT = @unit
 		COUNTER += 1
 	elsif FIRST_UNIT !== @unit
 		COUNTER += 1
 	else 
+		FIRST_UNIT = null
 		printf("counter: ${}\n", COUNTER)
 		printflush(message1)
 		break
 	end
-loop while FACTORY.config !== null && @unit.health > 0
+loop while FACTORY.config !== null && @unit.health > 0 && FIRST_UNIT !== null && FIRST_UNIT.health > 0
+	&& switch1.enabled
 
 FACTORY.enabled = COUNTER >= PROD_NUM ? false : true
 

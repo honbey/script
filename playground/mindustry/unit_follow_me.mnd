@@ -16,11 +16,20 @@ if !switch1.enabled
 	end()
 end
 
+UNIT_TYPE = @poly
+
 // ***************** Logic Start ********************** //
 
 do 
-	ubind(@mono)
-loop while @unit.health > 0
+	ubind(UNIT_TYPE)
+	// judge @unit
+	if player === null || player.dead || player.controlled !== 2
+		player = uradar(player, any, any, distance, true)
+	else
+		approach(player.x, player.y, 6)
+		targetp(player, false)
+	end
+loop while player !== null && !player.dead && player.controlled === 2
 
 // *****************  Logic End  ********************** //
 

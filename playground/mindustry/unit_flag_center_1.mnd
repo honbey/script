@@ -1,0 +1,74 @@
+#set target = ML7AS
+
+const DEBUG = true
+
+
+if !switch1.enabled
+	end()
+end
+
+// ***************** Logic Start ********************** //
+
+UNIT_TYPE = @flare
+
+KEEPALIVE = 0xFFFFFFFF
+
+MEM = cell1
+
+MEM[0] = UNIT_TYPE.id
+
+do
+
+if DEBUG === true
+	start = @time
+end
+if DEBUG === true
+	// debug memory cell, change N to one that linked by processor
+	D_MC = cell2
+	D_MSG = message1
+	allocate heap in D_MC[60...63]
+end
+
+	ubind(UNIT_TYPE)
+
+	if @unit === null || @unit.health <= 0
+		continue
+	end
+	if @unit.flag <= 0
+		free_id = lookupId()
+		if free_id > 0
+			MEM[free_id] = KEEPALIVE
+			do
+				flag(free_id)
+			loop while @unit.flag !== free_id && @unit.health > 0
+		end
+	end
+
+if DEBUG == true
+	end_ = @time
+	$runCount += 1
+	$totalTime += ceil(end_ - start)
+	if $totalTime > 0xFFF
+		avgTime = ceil($totalTime / $runCount)
+		$runCount = 0
+		$totalTime = 0
+	end
+	printf("\n[gray]LOG: Cost time: ${}ms\n", ceil(end_ - start))
+	printf("\n[gray]LOG: Avg Cost time: ${}ms\n", avgTime)
+	printflush(D_MSG)
+end
+
+// loop while @unit !== null && @unit.health > 0 && switch1.enabled
+loop while switch1.enabled
+
+def lookupId()
+	for i = 1; i <= 24; i += 1
+		if MEM[i] <= 0
+			return i
+		end
+	end
+	return -1
+end
+
+// *****************  Logic End  ********************** //
+

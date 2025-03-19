@@ -1,0 +1,93 @@
+#set target = ML7AS
+
+const DEBUG = false
+
+if DEBUG === true
+	start = @time
+end
+if DEBUG === true
+	// debug memory cell, change N to one that linked by processor
+	D_MC = cellN
+	D_MSG = messageN
+	allocate heap in D_MC[60...63]
+end
+
+if !switch1.enabled
+	end()
+end
+
+// ***************** Logic Start ********************** //
+
+UNIT_TYPE = @mono
+
+case UNIT_TYPE
+	when @mono then
+		AVAIL_ORE = case sorter1.config
+			when @copper, @lead, @sand, @scrap then
+				sorter1.config
+			else
+				null
+			end
+	when @poly, @pulsar then
+		AVAIL_ORE = case sorter1.config
+			when @copper, @lead, @sand, @scrap, @coal then
+				sorter1.config
+			else
+				null
+			end
+	when @mega, @quasar then
+		AVAIL_ORE = case sorter1.config
+			when @copper, @lead, @sand, @scrap, @coal, @titanium then
+				sorter1.config
+			else
+				null
+			end
+end
+
+ubind(UNIT_TYPE)
+core = ulocate(building, core, false, c_x, c_y, c_found)
+if !c_found
+	end()
+end
+
+AMOUNT = @unit.itemCapacity
+
+if AVAIL_ORE !== null
+	found = ulocate(ore, AVAIL_ORE, o_x, o_y)
+	if found !== true
+		end()
+	else
+		mining(core, AVAIL_ORE, o_x, o_y)
+	end
+end
+
+def mining(core, ore, x, y)
+	if @unit.firstItem === null
+		|| (@unit.firstItem === ore
+			&& @unit.totalItems < AMOUNT)
+		approach(x, y, 6)
+		mine(x, y)
+	elsif (@unit.firstItem !== ore)
+		move(@unit.x + 6, @unit.y + 6)
+		itemDrop(@air, AMOUNT)
+	else
+		approach(core.x, core.y, 8)
+		itemDrop(core, AMOUNT)
+	end
+end
+
+// *****************  Logic End  ********************** //
+
+if DEBUG == true
+	end_ = @time
+	$runCount += 1
+	$totalTime += ceil(end_ - start)
+	if $totalTime > 0xFFF
+		avgTime = ceil($totalTime / $runCount)
+		$runCount = 0
+		$totalTime = 0
+	end
+	printf("\n[gray]LOG: Cost time: ${}ms\n", ceil(end_ - start))
+	printf("\n[gray]LOG: Avg Cost time: ${}ms\n", avgTime)
+	printflush(D_MSG)
+end

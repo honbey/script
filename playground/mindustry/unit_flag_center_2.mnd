@@ -1,0 +1,168 @@
+#set target = ML7AS
+
+const DEBUG = false
+
+if DEBUG === true
+	start = @time
+end
+if DEBUG === true
+	// debug memory cell, change N to one that linked by processor
+	D_MC = cellN
+	D_MSG = messageN
+	allocate heap in D_MC[60...63]
+end
+
+if !switch1.enabled
+	end()
+end
+
+// ***************** Logic Start ********************** //
+
+MEM = cell1
+
+UNIT_TYPE = lookup(unit, MEM[0])
+COUNTER = 0
+NEW_DEAD = 0
+
+const M = 3
+
+printMemory(title, 1,  12, message1)
+printMemory(title, 13, 24, message2)
+clear(0, 0, 0)
+color(255, 255, 255, 255)
+image(40, 40, UNIT_TYPE, 75, 0)
+color(0, 255, 0, 200)
+n = COUNTER
+w1 = n < 10 ? 1 : floor(log10(n)) + 1
+for x = 63, w = 0; w < w1; w += 1, x -= 18, n \= 10
+	showNum(n % 10, x, 51)
+end
+if NEW_DEAD > 0
+	color(255, 0, 0, 200)
+	n = NEW_DEAD
+	w1 = n < 10 ? 1 : floor(log10(n)) + 1
+	for x = 63, w = 0; w < w1; w += 1, x -= 18, n \= 10
+		showNum(n % 10, x, 2)
+	end
+end
+drawflush(display1)
+
+def printMemory(title, lo, hi, msg)
+	printf("Unit id: [sky]${}[white]\n", MEM[0])
+	for i = lo; i <= hi; i += 1
+		if MEM[i] <= 0
+			printf("${}[${}]: [red]0[white]\n", UNIT_TYPE, i)
+			NEW_DEAD += 1
+		else
+			COUNTER += 1
+			printf("${}[${}]: [green]1[white]\n", UNIT_TYPE, i)
+		end
+	end
+	printflush(msg)
+end
+
+def showNum(n, x, y)
+	case n
+		when 0 then
+			show0(x, y)
+		when 1 then
+			show1(x, y)
+		when 2 then
+			show2(x, y)
+		when 3 then
+			show3(x, y)
+		when 4 then
+			show4(x, y)
+		when 5 then
+			show5(x, y)
+		when 6 then
+			show6(x, y)
+		when 7 then
+			show7(x, y)
+		when 8 then
+			show8(x, y)
+		when 9 then
+			show9(x, y)
+	end
+end
+
+def show0(x, y) 
+	stroke(M)
+	lineRect(x, y, 5 * M, 9 * M)
+end
+
+def show1(x, y) 
+	rect(x + 1 * M, y, 3 * M, 1 * M)
+	rect(x + 2 * M, y + 1 * M, 1 * M, 8 * M)
+	rect(x + 1 * M, y + 7 * M, 1 * M, 1 * M)
+end
+
+def show2(x, y) 
+	rect(x, y, 5 * M, 1 * M)
+	rect(x, y + 1 * M, 1 * M, 3 * M)
+	rect(x, y + 4 * M, 5 * M, 1 * M)
+	rect(x + 4 * M, y + 5 * M, 1 * M, 3 * M)
+	rect(x, y + 8 * M, 5 * M, 1 * M)
+end
+
+def show3(x, y) 
+	rect(x, y, 5 * M, 1 * M)
+	rect(x + 4 * M, y + 1 * M, 1 * M, 7 * M)
+	rect(x, y + 4 * M, 5 * M, 1 * M)
+	rect(x, y + 8 * M, 5 * M, 1 * M)
+end
+
+def show4(x, y) 
+	rect(x + 4 * M, y, 1 * M, 9 * M)
+	rect(x, y + 4 * M, 4 * M, 1 * M)
+	rect(x, y + 5 * M, 1 * M, 4 * M)
+end
+
+def show5(x, y) 
+	rect(x, y, 5 * M, 1 * M)
+	rect(x + 4 * M, y + 1 * M, 1 * M, 3 * M)
+	rect(x, y + 4 * M, 5 * M, 1 * M)
+	rect(x, y + 5 * M, 1 * M, 3 * M)
+	rect(x, y + 8 * M, 5 * M, 1 * M)
+end
+
+def show6(x, y) 
+	stroke(M)
+	lineRect(x, y, 5 * M, 5 * M)
+	rect(x, y + 5 * M, 1 * M, 3 * M)
+	rect(x, y + 8 * M, 5 * M, 1 * M)
+end
+
+def show7(x, y) 
+	rect(x + 4 * M, y, 1 * M, 9 * M)
+	rect(x, y + 8 * M, 4 * M, 1 * M)
+end
+
+def show8(x, y) 
+	stroke(M)
+	lineRect(x, y, 5 * M, 5 * M)
+	lineRect(x, y + 4 * M, 5 * M, 5 * M)
+end
+
+def show9(x, y) 
+	stroke(M)
+	rect(x, y, 5 * M, 1 * M)
+	rect(x + 4 * M, y + 1 * M, 1 * M, 3 * M)
+	lineRect(x, y + 4 * M, 5 * M, 5 * M)
+end
+
+// *****************  Logic End  ********************** //
+
+if DEBUG == true
+	end_ = @time
+	$runCount += 1
+	$totalTime += ceil(end_ - start)
+	if $totalTime > 0xFFF
+		avgTime = ceil($totalTime / $runCount)
+		$runCount = 0
+		$totalTime = 0
+	end
+	printf("\n[gray]LOG: Cost time: ${}ms\n", ceil(end_ - start))
+	printf("\n[gray]LOG: Avg Cost time: ${}ms\n", avgTime)
+	printflush(D_MSG)
+end

@@ -1,0 +1,28 @@
+#set target = ML7AS
+
+const DEBUG = false
+
+
+if !switch1.enabled
+	end()
+end
+
+// ***************** Logic Start ********************** //
+
+UNIT_TYPE = lookup(unit, MEM[0])
+
+KEEPALIVE = 0xFFFFFFFF
+
+MEM = cell1
+
+ubind(UNIT_TYPE)
+
+if @unit === null || @unit.health <= 0
+	end()
+end
+if @unit.flag > 0
+	MEM[@unit.flag] = KEEPALIVE
+end
+
+// *****************  Logic End  ********************** //
+

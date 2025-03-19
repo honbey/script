@@ -18,9 +18,16 @@ end
 
 // ***************** Logic Start ********************** //
 
-do 
-	ubind(@mono)
-loop while @unit.health > 0
+MEM = cell1
+
+// UNIT_TYPE = lookup(unit, MEM[0])
+// ubind(UNIT_TYPE)
+
+for i = 1; i <= 24; i += 1
+	MEM[i] >>= 1
+end
+
+// TODO: count controlled by processor
 
 // *****************  Logic End  ********************** //
 

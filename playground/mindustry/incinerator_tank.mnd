@@ -1,0 +1,15 @@
+// Tank connect with a *original conduit* to incinerator
+// or the destruction rate will too quick to keep threshold
+#set target=ML7AS
+
+TANK_THR = 1500
+
+while true
+	if tank1.totalLiquids >= TANK_THR
+		TANK_THR = 900
+		incinerator1.enabled = 1
+	else
+		TANK_THR = 1500
+		incinerator1.enabled = 0
+	end
+end
