@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="author" content="Honbey">
+  <title>Kit 22 - Time</title>
+  <link type="text/css" rel="stylesheet" href="resources/css/bulma.min.css">
+</head>
+
+<body>
+  <nav class="navbar" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/">
+        <img alt="logo" src="resources/logo.png" width="28" height="28">
+      </a>
+
+      <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+      </a>
+    </div>
+  </nav>
+  <div class="hero">
+    <div class="hero-body">
+      <div class="container">
+        <div class="columns">
+          <div class="column">
+            <div class="columns">
+              <div class="column is-2">
+                <div class="field is-grouped">
+                  <div class="control">
+                    <button class="button is-link" title="ToTimestamp">To Timestamp</button>
+                  </div>
+                </div>
+              </div>
+              <div class="column is-2">
+                <div class="field is-grouped">
+                  <div class="control">
+                    <button class="button is-link" title="ToDatetime">To Datetime</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="columns">
+              <div class="column is-2">
+                <div class="field">
+                  <label class="label">Date</label>
+                  <div class="control">
+                    <input class="input" type="date" value="2022-01-01" name="date">
+                  </div>
+                </div>
+              </div>
+              <div class="column is-2">
+                <div class="field">
+                  <label class="label">Time</label>
+                  <div class="control">
+                    <input class="input" type="time" value="12:00:00" name="time" step="1">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="field">
+              <label class="label">Timestamp</label>
+              <div class="control">
+                <input class="input" type="text" placeholder="Timestamp" name="timestamp">
+              </div>
+            </div>
+            <div class="field">
+              <label class="label">Local Time</label>
+              <div class="control">
+                <input class="input is-success" type="text" placeholder="Local Time" name="localTime" readonly>
+              </div>
+            </div>
+            <div class="field">
+              <label class="label">ISO Time</label>
+              <div class="control">
+                <input class="input is-success" type="text" placeholder="UTC Time" name="isoTime" readonly>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script type="text/javascript" src="js/common.js"></script>
+  <script type="text/javascript" src="js/jshash-2.2/md5-min.js"></script>
+  <script type="text/javascript" src="js/jshash-2.2/sha1-min.js"></script>
+  <script type="text/javascript" src="js/jshash-2.2/sha256-min.js"></script>
+  <script type="text/javascript" src="js/jshash-2.2/sha512-min.js"></script>
+  <script>
+    'use strict'
+
+    let date1 = document.querySelector('[name="date"]');
+    let time1 = document.querySelector('[name="time"]');
+    let timestamp = document.querySelector('[name="timestamp"]');
+    let localTime = document.querySelector('[name="localTime"]');
+    let isoTime = document.querySelector('[name="isoTime"]');
+
+    document.querySelector('[title="ToTimestamp"]').onclick = () => {
+      let datetimeStr = date1.value + ' ' + time1.value;
+      timestamp.value = (new Date(datetimeStr)).getTime() / 1000;
+      localTime.value = new Date(parseInt(timestamp.value) * 1000).toLocaleString();
+      isoTime.value = new Date(parseInt(timestamp.value) * 1000).toISOString();
+    }
+    document.querySelector('[title="ToDatetime"]').onclick = () => {
+      localTime.value = new Date(parseInt(timestamp.value) * 1000).toLocaleString();
+      isoTime.value = new Date(parseInt(timestamp.value) * 1000).toISOString();
+      date1.value = isoTime.value.slice(0, 10);
+      time1.value = isoTime.value.slice(11, 19);
+    }
+  </script>
+</body>
+
+</html>

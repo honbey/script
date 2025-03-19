@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="author" content="Honbey">
+  <title>Kit 22 - Character Convert</title>
+  <link type="text/css" rel="stylesheet" href="resources/css/bulma.min.css">
+</head>
+
+<body>
+  <nav class="navbar" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/">
+        <img alt="logo" src="resources/logo.png" width="28" height="28">
+      </a>
+
+      <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+      </a>
+    </div>
+  </nav>
+  <div class="hero">
+    <div class="hero-body">
+      <div class="container">
+        <div class="columns">
+          <div class="column is-2">
+            <button class="button is-success" title="URL Encode">URL Encode</button>
+          </div>
+          <div class="column is-2">
+            <button class="button is-success" title="HTML Encode">HTML Encode</button>
+          </div>
+          <div class="column is-2">
+            <button class="button is-success" title="BASE64 Encode">BASE64 Encode</button>
+          </div>
+          <div class="column is-2">
+            <button class="button is-success" title="To UTF-8">To UTF-8</button>
+          </div>
+          <div class="column is-2">
+            <button class="button is-success" title="To Unicode">To Unicode</button>
+          </div>
+          <div class="column is-2">
+            <button class="button is-success" title="To ASCII">To ASCII</button>
+          </div>
+        </div>
+        <div class="columns">
+          <div class="column is-2">
+            <button class="button is-primary" title="URL Decode">URL Decode</button>
+          </div>
+          <div class="column is-2">
+            <button class="button is-primary" title="HTML Decode">HTML Decode</button>
+          </div>
+          <div class="column is-2">
+            <button class="button is-primary" title="BASE64 Decode">BASE64 Decode</button>
+          </div>
+          <div class="column is-2">
+            <button class="button is-primary" title="From UTF-8">From UTF-8</button>
+          </div>
+          <div class="column is-2">
+            <button class="button is-primary" title="From Unicode">From Unicode</button>
+          </div>
+          <div class="column is-2">
+            <button class="button is-primary" title="From ASCII">From ASCII</button>
+          </div>
+        </div>
+        <div class="control">
+          <label>Single Column: </label>
+          <label class="radio">
+            <input type="radio" name="single">
+            Yes
+          </label>
+          <label class="radio">
+            <input type="radio" name="double" checked>
+            No
+          </label>
+        </div>
+        <div class="columns">
+          <div class="column">
+            <textarea class="textarea has-fixed-size" placeholder="Input" rows="10" name="input"></textarea>
+          </div>
+          <div class="column">
+            <textarea class="textarea has-fixed-size" placeholder="Output" rows="10" name="output" readonly></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script type="text/javascript" src="js/common.js"></script>
+  <script type="text/javascript" src="js/character-convert.js"></script>
+</body>
+
+</html>

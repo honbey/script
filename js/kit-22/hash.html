@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="author" content="Honbey">
+  <title>Kit 22 - Hash</title>
+  <link type="text/css" rel="stylesheet" href="resources/css/bulma.min.css">
+</head>
+
+<body>
+  <nav class="navbar" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/">
+        <img alt="logo" src="resources/logo.png" width="28" height="28">
+      </a>
+
+      <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+      </a>
+    </div>
+  </nav>
+  <div class="hero">
+    <div class="hero-body">
+      <div class="container">
+        <div class="columns">
+          <div class="column">
+            <div class="field is-grouped">
+              <div class="control">
+                <button class="button is-link" title="Hash">Hash</button>
+              </div>
+            </div>
+            <div class="field">
+              <label class="label">Input</label>
+              <div class="control">
+                <input class="input" type="text" placeholder="Text input" name="input">
+              </div>
+            </div>
+            <div class="field">
+              <label class="label">MD5</label>
+              <div class="control">
+                <input class="input is-success" type="text" placeholder="MD5 input" name="md5" readonly>
+              </div>
+            </div>
+            <div class="field">
+              <label class="label">SHA1</label>
+              <div class="control">
+                <input class="input is-success" type="text" placeholder="SHA1 input" name="sha1" readonly>
+              </div>
+            </div>
+            <div class="field">
+              <label class="label">SHA256</label>
+              <div class="control">
+                <input class="input is-success" type="text" placeholder="SHA256 input" name="sha256" readonly>
+              </div>
+            </div>
+            <div class="field">
+              <label class="label">SHA512</label>
+              <div class="control">
+                <input class="input is-success" type="text" placeholder="SHA512 input" name="sha512" readonly>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script type="text/javascript" src="js/common.js"></script>
+  <script type="text/javascript" src="js/jshash-2.2/md5-min.js"></script>
+  <script type="text/javascript" src="js/jshash-2.2/sha1-min.js"></script>
+  <script type="text/javascript" src="js/jshash-2.2/sha256-min.js"></script>
+  <script type="text/javascript" src="js/jshash-2.2/sha512-min.js"></script>
+  <script>
+    'use strict'
+
+    let input = document.querySelector('[name="input"]');
+    let md5 = document.querySelector('[name="md5"]');
+    let sha1 = document.querySelector('[name="sha1"]');
+    let sha256 = document.querySelector('[name="sha256"]');
+    let sha512 = document.querySelector('[name="sha512"]');
+
+    document.querySelector('[title="Hash"]').onclick = () => {
+      let src = input.value;
+      md5.value = hex_md5(src);
+      sha1.value = hex_sha1(src);
+      sha256.value = hex_sha256(src);
+      sha512.value = hex_sha512(src);
+    }
+  </script>
+</body>
+
+</html>
