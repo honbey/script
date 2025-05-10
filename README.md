@@ -1,12 +1,28 @@
 # Script
 
+## linux
+
+Shell script on Linux.
+
+### wsl
+
+Windows Subsystem for Linux.
+
+## macos
+
+Shell script on macOS.
+
+## windows
+
+Bat script or Windows Register.
+
 ## js
 
 JavaScript codes.
 
-## linux
+## python
 
-Shell script on Linux / macOS.
+Python codes.
 
 ## playground
 
@@ -18,8 +34,4 @@ Logic codes of Mindustry by Mindcode.
 
 ### sh
 
-Shell script.
-
-## windows
-
-Bat script or Windows Register.
+bash/zsh codes.
