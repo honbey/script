@@ -10,5 +10,5 @@ FILE_NAME="vaultwarden_bak_$(date +"%Y-%m-%d").tar.gz"
 
 file_path="${1}"
 cd "${file_path}/data/"
-tar czf "${FILE_NAME}" ./*
-mv "${FILE_NAME}" "${file_path}/backup/"
+tar czf "${FILE_NAME}" --exclude "icon_cache" ./*
+mv "${FILE_NAME}" "${file_path}/backups/"
