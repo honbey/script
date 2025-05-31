@@ -41,6 +41,7 @@ def format_exchange(exchange_str):
         "i": Text("现在分词: ", style="bold cyan"),
         "3": Text("第三人称单数: ", style="bold cyan"),
         "r": Text("比较级: ", style="bold cyan"),
+        "t": Text("最高级: ", style="bold cyan"),
         "s": Text("复数形式: ", style="bold cyan"),
     }
 
