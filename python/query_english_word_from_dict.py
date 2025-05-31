@@ -16,7 +16,7 @@ def query_word(database_path, word_pattern):
         query = """
         SELECT word, phonetic, definition, exchange, translation 
         FROM stardict 
-        WHERE word LIKE ?
+        WHERE word = ?
         """
         cursor.execute(query, (f"{word_pattern}",))
         results = cursor.fetchall()
