@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 TIME="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
-CHERY_ACCESS_TOEKN="XXXXXX"
+CHERY_ACCESS_TOKEN="XXXXXX"
 
 shopt -s expand_aliases
 
@@ -10,7 +10,7 @@ if [[ $1 != "force" ]]; then
 fi
 
 curl --silent --compressed \
-  -X OPTIONS "https://mobile-consumer-sapp.chery.cn/web/event/trigger?access_token=${CHERY_ACCESS_TOEKN}" \
+  -X OPTIONS "https://mobile-consumer-sapp.chery.cn/web/event/trigger?access_token=${CHERY_ACCESS_TOKEN}" \
   -H 'Accept: */*' \
   -H 'Accept-Encoding: gzip, deflate' \
   -H 'Access-Control-Request-Headers: authorization,content-type' \
@@ -26,11 +26,11 @@ rome/99.0.4844.88 Mobile Safari/537.36 android/1.0.0' \
   -H 'Sec-Fetch-Dest: empty'
 
 res=$(curl --silent --compressed \
-  -X POST "https://mobile-consumer-sapp.chery.cn/web/event/trigger?access_token=${CHERY_ACCESS_TOEKN}" \
+  -X POST "https://mobile-consumer-sapp.chery.cn/web/event/trigger?access_token=${CHERY_ACCESS_TOKEN}" \
   -H 'Accept: */*' \
   -H 'Accept-Language: zh-CN,zh' \
   -H 'Accept-Encoding: gzip, deflate' \
-  -H "Authorization: Bearer ${CHERY_ACCESS_TOEKN}" \
+  -H "Authorization: Bearer ${CHERY_ACCESS_TOKEN}" \
   -H 'Connection: keep-alive' \
   -H 'Content-Type: application/json' \
   -H 'Origin: https://hybrid-sapp.chery.cn' \
